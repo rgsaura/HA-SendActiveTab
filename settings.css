@@ -1,0 +1,25 @@
+.haconfig {
+  background-color: white;
+  margin: 1em;
+  padding: 0.5em;
+  display: flex;
+  flex-direction: column;
+}
+
+.haconfig div {
+  display: flex;
+}
+
+.label {
+  width: 6em;
+}
+
+h1 {
+  margin: 0;
+  padding: 0 0 1em 0;
+}
+
+.savediv {
+  margin-top: 0.5em;
+  width: 100%;
+}

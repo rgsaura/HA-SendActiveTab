@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="settings.css" />
+    <title>HA</title>
+  </head>
+  <body>
+    <div class="haconfig">
+      <h1>HA Tabs</h1>
+      <div>
+        <label class="label" for="host">HA Host: </label>
+        <input type="text" name="host" id="host" />
+      </div>
+      <div>
+        <label class="label" for="apikey">API Key: </label>
+        <input type="text" name="apikey" id="apikey" />
+      </div>
+
+      <div>
+        <label class="label" for="sites">Sites: </label>
+        <input
+          type="text"
+          name="sites"
+          id="sites"
+          placeholder="netflix.com;youtube.com;disney.com"
+        />
+      </div>
+      <div>
+        <label class="label" for="device">Device: </label>
+        <input type="text" name="device" id="device" placeholder="hatabs" />
+      </div>
+
+      <div class="savediv">
+        <div style="flex-grow: 1"></div>
+        <div>
+          <button name="save" id="save" style="float: right">Save</button>
+        </div>
+      </div>
+    </div>
+    <script src="./settings.js" type="text/javascript"></script>
+  </body>
+</html>

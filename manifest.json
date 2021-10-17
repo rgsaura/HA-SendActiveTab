@@ -1,0 +1,20 @@
+{
+  "manifest_version": 2,
+  "name": "HA-CinemaTime",
+  "version": "1.0",
+
+  "description": "Lets your HA server know if certain websites are open, so you can run automations based on them (such as turning Hyperion on when you open Netflix).",
+
+  "icons": {
+    "48": "icons/border-48.png"
+  },
+  "background": {
+    "scripts": ["background.js"]
+  },
+  "permissions": ["tabs", "<all_urls>"],
+  "browser_action": {
+    "browser_style": true,
+    "default_title": "Tabs, tabs, tabs",
+    "default_popup": "settings.html"
+  }
+}
