@@ -1,6 +1,7 @@
 const SETTINGS_KEY = "HATABS_SETTINGS";
+let last_on = null;
 
-function checkTabs(tabId, isOnRemoved) {
+function checkTabs() {
   const settings = JSON.parse(localStorage.getItem(SETTINGS_KEY) || "{}");
 
   const { host, apikey, device, sites } = settings;
@@ -9,38 +10,40 @@ function checkTabs(tabId, isOnRemoved) {
     console.log("invalid settings for HA-Tabs");
   }
 
-  const siteary = (sites || "").split(";");
+  const siteary = (sites || "")
+    .split(";")
+    .map((x) => x.trim())
+    .filter((x) => x !== "");
 
   browser.tabs.query({}).then((tabs) => {
     let on = false;
-    let mytabs = [...tabs];
 
-    // onRemoved fires too early and the count is one too many.
-    // see https://bugzilla.mozilla.org/show_bug.cgi?id=1396758
-    if (isOnRemoved) {
-      mytabs = mytabs.filter((t) => t.id !== tabId);
+    const activeTab = tabs.find((tab) => tab.active);
+
+    if (activeTab) {
+      on = siteary.some((site) => {
+        return activeTab.url.includes(site);
+      });
     }
 
-    for (let tab of mytabs) {
-      for (let site of siteary) {
-        if (tab.active && tab.url.includes(site)) on = true;
+    if (on !== last_on) {
+      last_on = on;
+
+      var req = new XMLHttpRequest();
+      const url = `${host}/api/states/${device}`;
+
+      req.open("POST", url, true);
+      req.setRequestHeader("Content-type", "application/json");
+      req.setRequestHeader("Authorization", `Bearer ${apikey}`);
+
+      if (on) {
+        browser.browserAction.setBadgeText({ text: "✓" });
+        browser.browserAction.setBadgeBackgroundColor({ color: "green" });
+        req.send('{"state":"on"}');
+      } else {
+        browser.browserAction.setBadgeText({ text: "" });
+        req.send('{"state":"off"}');
       }
-    }
-    var req = new XMLHttpRequest();
-    const url = `${host}/api/states/${device}`;
-
-    req.open("POST", url, true);
-    req.setRequestHeader("Content-type", "application/json");
-    req.setRequestHeader("Authorization", `Bearer ${apikey}`);
-
-    if (on) {
-      browser.browserAction.setBadgeText({ text: "✓" });
-      browser.browserAction.setBadgeBackgroundColor({ color: "green" });
-
-      req.send('{"state":"on"}');
-    } else {
-      browser.browserAction.setBadgeText({ text: "" });
-      req.send('{"state":"off"}');
     }
   });
 }
@@ -55,4 +58,17 @@ browser.tabs.onCreated.addListener((tabId) => {
 browser.tabs.onUpdated.addListener((tabId) => {
   checkTabs(tabId, false);
 });
+
+browser.tabs.onActivated.addListener((tabId) => {
+  checkTabs(tabId, false);
+});
+
+browser.windows.onCreated.addListener(() => {
+  checkTabs();
+});
+
+browser.windows.onFocusChanged.addListener(() => {
+  checkTabs();
+});
+
 checkTabs();
