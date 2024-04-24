@@ -2,6 +2,13 @@
 
 This is a browser extension to automate things on Homeassistant when you have a specific tab being displayed on your browser. I use it for turning Hyperion on when I'm watching Netflix. But what the extension does is turn "on" and "off" a "virtual" switch which you can subscribe to with automations and do whatever else you want to do.
 
+## Modified by @rgsaura
+
+It sends active Tab name, if you are at https://github.com/rgsaura/HA-SendActiveTab/edit/master/README.md it sends "Editing HA-SendActiveTab/README.md at master · rgsaura/HA-SendActiveTab", the text on the actual Tab.
+
+<img src="https://github.com/rgsaura/HA-SendActiveTab/assets/16281075/e9a1f34f-573b-43ff-8d14-593b320e3a06" height="200">
+
+
 ## Installing the extension
 
 ### Ready to use
