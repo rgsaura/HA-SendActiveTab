@@ -7,6 +7,7 @@ This is a browser extension to automate things on Homeassistant when you have a 
 It sends active Tab name, if you are at https://github.com/rgsaura/HA-SendActiveTab/edit/master/README.md it sends "Editing HA-SendActiveTab/README.md at master · rgsaura/HA-SendActiveTab", the text on the actual Tab.
 
 <img src="https://github.com/rgsaura/HA-SendActiveTab/assets/16281075/e9a1f34f-573b-43ff-8d14-593b320e3a06" height="200">
+<img src="https://github.com/rgsaura/HA-SendActiveTab/assets/16281075/a44c9763-8e2e-42ed-97c1-6c01c3253ec4" height="200">
 
 
 ## Installing the extension
