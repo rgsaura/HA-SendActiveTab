@@ -1,74 +1,62 @@
 const SETTINGS_KEY = "HATABS_SETTINGS";
-let last_on = null;
+
+// Define the api variable for compatibility
+const api = typeof browser === "undefined" ? chrome : browser;
 
 function checkTabs() {
-  const settings = JSON.parse(localStorage.getItem(SETTINGS_KEY) || "{}");
+  // Use chrome.storage API to access the settings
+  chrome.storage.local.get([SETTINGS_KEY], (result) => {
+    const settings = result[SETTINGS_KEY] ? JSON.parse(result[SETTINGS_KEY]) : {};
+    const { host, apikey, device } = settings;
 
-  const { host, apikey, device, sites } = settings;
-
-  if (!host || !apikey || !device || !sites) {
-    console.log("invalid settings for HA-Tabs");
-  }
-
-  const siteary = (sites || "")
-    .split(";")
-    .map((x) => x.trim())
-    .filter((x) => x !== "");
-
-  browser.tabs.query({}).then((tabs) => {
-    let on = false;
-
-    const activeTab = tabs.find((tab) => tab.active);
-
-    if (activeTab) {
-      on = siteary.some((site) => {
-        return activeTab.url.includes(site);
-      });
+    if (!host || !apikey || !device) {
+      console.log("Invalid settings for HA-Tabs");
+      return; // Exit if settings are invalid
     }
 
-    if (on !== last_on) {
-      last_on = on;
+    chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
+      const activeTab = tabs[0];
+      if (activeTab) {
+        // Use fetch API for the network request
+        const url = `${host}/api/states/${device}`;
+        const headers = new Headers({
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apikey}`
+        });
 
-      var req = new XMLHttpRequest();
-      const url = `${host}/api/states/${device}`;
+        const body = JSON.stringify({ state: activeTab.title });
 
-      req.open("POST", url, true);
-      req.setRequestHeader("Content-type", "application/json");
-      req.setRequestHeader("Authorization", `Bearer ${apikey}`);
-
-      if (on) {
-        browser.browserAction.setBadgeText({ text: "✓" });
-        browser.browserAction.setBadgeBackgroundColor({ color: "green" });
-        req.send('{"state":"on"}');
-      } else {
-        browser.browserAction.setBadgeText({ text: "" });
-        req.send('{"state":"off"}');
+        fetch(url, {
+          method: 'POST',
+          headers: headers,
+          body: body
+        })
+        .then(response => {
+          if (response.ok) {
+            return response.json();
+          }
+          throw new Error('Network response was not ok.');
+        })
+        .then(data => {
+          console.log('Success:', data);
+          chrome.action.setBadgeText({ text: "✓" });
+          chrome.action.setBadgeBackgroundColor({ color: "green" });
+        })
+        .catch((error) => {
+          console.error('Error:', error);
+        });
       }
-    }
+    });
   });
 }
 
-browser.tabs.onRemoved.addListener((tabId) => {
-  checkTabs(tabId, true);
-});
+// Listen for tab events with the appropriate API
+api.tabs.onRemoved.addListener(checkTabs);
+api.tabs.onCreated.addListener(checkTabs);
+api.tabs.onUpdated.addListener(checkTabs);
+api.tabs.onActivated.addListener(checkTabs);
+api.windows.onCreated.addListener(checkTabs);
+api.windows.onFocusChanged.addListener(checkTabs);
 
-browser.tabs.onCreated.addListener((tabId) => {
-  checkTabs(tabId, false);
-});
-browser.tabs.onUpdated.addListener((tabId) => {
-  checkTabs(tabId, false);
-});
-
-browser.tabs.onActivated.addListener((tabId) => {
-  checkTabs(tabId, false);
-});
-
-browser.windows.onCreated.addListener(() => {
-  checkTabs();
-});
-
-browser.windows.onFocusChanged.addListener(() => {
-  checkTabs();
-});
-
+// Initial check
 checkTabs();

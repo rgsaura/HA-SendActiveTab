@@ -1,9 +1,14 @@
+body {
+  min-width: 300px; /* Adjust this value as needed */
+}
+
 .haconfig {
   background-color: white;
   margin: 1em;
   padding: 0.5em;
   display: flex;
   flex-direction: column;
+  min-width: 280px; /* Adjust this value as needed */
 }
 
 .haconfig div {

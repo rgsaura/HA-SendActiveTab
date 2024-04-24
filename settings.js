@@ -1,31 +1,40 @@
 const SETTINGS_KEY = "HATABS_SETTINGS";
-function loadSettings() {
-  return JSON.parse(localStorage.getItem(SETTINGS_KEY) || "{}");
+
+function loadSettings(callback) {
+  chrome.storage.local.get([SETTINGS_KEY], (result) => {
+    const settings = result[SETTINGS_KEY] ? JSON.parse(result[SETTINGS_KEY]) : {};
+    callback(settings);
+  });
 }
 
 function saveSettings() {
   const settings = getSettingsFromDOM();
-  localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+  chrome.storage.local.set({[SETTINGS_KEY]: JSON.stringify(settings)}, () => {
+    console.log("Settings saved");
+  });
 }
 
 function getSettingsFromDOM() {
   const settings = {};
-  for (let k of ["host", "apikey", "device", "sites"]) {
+  for (let k of ["host", "apikey", "device"]) {
     settings[k] = document.getElementById(k)?.value;
   }
   return settings;
 }
 
-function setSettingsToDOM() {
-  const settings = loadSettings();
-  console.log(settings);
+function setSettingsToDOM(settings) {
   for (let k of Object.keys(settings)) {
-    document.getElementById(k).value = settings[k];
+    if (document.getElementById(k)) {
+      document.getElementById(k).value = settings[k];
+    }
   }
 }
-setSettingsToDOM();
 
 document.addEventListener("DOMContentLoaded", function () {
+  loadSettings((settings) => {
+    setSettingsToDOM(settings);
+  });
+
   var link = document.getElementById("save");
   link.addEventListener("click", function () {
     saveSettings();

@@ -1,25 +1,21 @@
 {
-  "manifest_version": 2,
-  "name": "HA-CinemaTime",
+  "manifest_version": 3,
+  "name": "HA-SendActiveTab",
   "version": "0.0.4",
-  "browser_specific_settings": {
-    "gecko": {
-      "strict_min_version": "58.0a1",
-      "id": "{707413e0-79e2-4b80-aa42-2575cee4ace9}"
-    }
-  },
   "description": "Lets your HA server know if certain websites are open, so you can run automations based on them (such as turning Hyperion on when you open Netflix).",
-
   "icons": {
     "512": "icons/icon.png"
   },
   "background": {
-    "scripts": ["browser-polyfill.js", "background.js"]
+    "service_worker": "background.js"
   },
-  "permissions": ["tabs", "<all_urls>"],
-  "browser_action": {
-    "browser_style": true,
+  "permissions": ["tabs","storage","activeTab","scripting"],
+  "host_permissions": [
+    "*://*/*"
+  ],
+  "action": {
     "default_title": "Tabs, tabs, tabs",
     "default_popup": "settings.html"
   }
 }
+
